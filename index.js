@@ -2,7 +2,7 @@
  * Generic message queue
  * @class
  * */
- class MessageQueue {
+class MessageQueue {
   /**
    * Create a message queue, injecting a client (e.g. SQS)
    * @param {string} clientType - client type (currently available only 'sqs')
@@ -10,7 +10,7 @@
    * @param {string} options.queuePrefix Defaults to "testing"
    */
   constructor (clientType, options = {}) {
-    // this.client = client
+    let client
     if (clientType === 'sqs') {
       client = new (require('./sqs-client'))({ endpoint: process.env.MESSAGE_QUEUE_ENDPOINT })
     } else {
@@ -62,4 +62,6 @@
   }
 }
 
-module.exports = MessageQueue
+module.exports = {
+  MessageQueue
+}
