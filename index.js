@@ -2,12 +2,13 @@
  * Generic message queue
  * @class
  * */
-class MessageQueue {
+ class MessageQueue {
   /**
    * Create a message queue, injecting a client (e.g. SQS)
    * @param {string} clientType - client type (currently available only 'sqs')
    * @param {*} options
-   * @param {string} options.queuePrefix Defaults to "testing"
+   * @param {string} options.topicPrefix topic name prefix
+   * @param {string} options.topicPostfix topic name postfix
    */
   constructor (clientType, options = {}) {
     let client
@@ -16,12 +17,15 @@ class MessageQueue {
     } else {
       throw new Error('MessageQueue clientType is not supported')
     }
-    this.queuePrefix = options.queuePrefix || 'testing'
+    this.topicPrefix = options.topicPrefix
+    this.topicPostfix = options.topicPostfix
     this.client = client
   }
 
   queueName (eventName) {
-    return `${this.queuePrefix}-${eventName}`
+    const prefix = this.topicPrefix ? `${this.topicPrefix}-` : ''
+    const postfix = this.topicPostfix ? `-${this.topicPostfix}` : ''
+    return `${prefix}${eventName}${postfix}`
   }
 
   /**

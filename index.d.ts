@@ -3,11 +3,13 @@ import SQS from 'aws-sdk/clients/sqs'
 declare module '@rfcx/message-queue' {
   function MessageHandler(message: object): boolean
   interface MessageQueueOptions {
-    queuePrefix?: string
+    topicPrefix?: string
+    topicPostfix?: string
   }
   class MessageQueue {
     constructor(clientType: string, options?: MessageQueueOptions)
-    queuePrefix: string
+    topicPrefix?: string
+    topicPostfix?: string
     client: unknown
     queueName(): string
     publish(eventName: string, message: unknown): void
