@@ -1,7 +1,7 @@
 import SQS from 'aws-sdk/clients/sqs'
 
 declare module '@rfcx/message-queue' {
-  function MessageHandler(message: object): boolean
+  function MessageHandler(message: any): boolean
   interface MessageQueueOptions {
     topicPrefix?: string
     topicPostfix?: string
