@@ -13,7 +13,7 @@
   constructor (clientType, options = {}) {
     let client
     if (clientType === 'sqs') {
-      client = new (require('./sqs-client'))({ endpoint: options.endpoint || process.env.MESSAGE_QUEUE_ENDPOINT })
+      client = new (require('./sqs-client'))({ endpoint: process.env.MESSAGE_QUEUE_ENDPOINT })
     } else {
       throw new Error('MessageQueue clientType is not supported')
     }
