@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
@@ -16,5 +16,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/rfcx/message-queue.git"
+  },
+  "devDependencies": {
+    "jest": "^27.2.5"
   }
 }
