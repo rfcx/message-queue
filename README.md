@@ -53,3 +53,8 @@ For `SNS` client: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_KEY`, `AWS_REGION_ID`, `AWS_A
 ## Additional notes
 
 - Note that `SNS` client does not have `subscribe` method as you can't subscribe directly to `SNS` topic.
+
+## Publishing
+
+Publishing to NPM registry is done automatically via GitHub Actions once new release is published in the GitHub repository.
+You must have `NPM_PUBLISH_TOKEN` secret to be defined in your repository or organization. Reference [this](https://docs.github.com/en/actions/security-guides/encrypted-secrets) or [this](https://sergiodxa.com/articles/github-actions-npm-publish#configure-the-secret) for instructions.
