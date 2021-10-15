@@ -52,7 +52,7 @@ class SNSMessageQueueClient {
       Message: JSON.stringify(message),
       TopicArn: await this.topicArn(topicName)
     }
-    await this.sns.publish(payload).promise()
+    return await this.sns.publish(payload).promise()
   }
 
   async subscribe (topicName, messageHandler) {
