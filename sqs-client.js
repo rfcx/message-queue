@@ -66,7 +66,7 @@ class SQSMessageQueueClient {
       MessageBody: JSON.stringify(message),
       QueueUrl: await this.queueUrl(queueName)
     }
-    await this.sqs.sendMessage(payload).promise()
+    return await this.sqs.sendMessage(payload).promise()
   }
 
   async subscribe (queueName, messageHandler) {
