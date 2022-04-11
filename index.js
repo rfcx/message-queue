@@ -42,7 +42,7 @@
   async publish (eventName, message) {
     const queue = this.queueName(eventName)
 
-    console.info(`Message Queue: ${queue}: Publishing`, message)
+    console.info(`Message Queue: ${queue}: Publishing ${JSON.stringify(message)}`)
     try {
       await this.client.publish(queue, message)
     } catch (err) {
@@ -65,7 +65,7 @@
   subscribe (eventName, messageHandler) {
     const queue = this.queueName(eventName)
     this.client.subscribe(queue, (message) => {
-      console.info(`Message Queue: ${queue}: Receiving`, message)
+      console.info(`Message Queue: ${queue}: Receiving ${JSON.stringify(message)}`)
       return messageHandler(message)
     })
   }
