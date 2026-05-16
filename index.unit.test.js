@@ -44,3 +44,21 @@ describe('Subscribe', () => {
     expect(messageHandler).toHaveBeenCalledTimes(1)
   })
 })
+
+describe('Construction', () => {
+  test('rabbitmq client requires connection url', () => {
+    delete process.env.RABBITMQ_URL
+    delete process.env.AMQP_URL
+    expect(() => new MessageQueue('rabbitmq')).toThrow(/RABBITMQ_URL/)
+  })
+
+  test('rabbitmq client constructs when url present', () => {
+    process.env.RABBITMQ_URL = 'amqp://x:y@localhost:5672'
+    const mq = new MessageQueue('rabbitmq')
+    expect(mq.client.constructor.name).toBe('RabbitMQMessageQueueClient')
+  })
+
+  test('unknown client type throws', () => {
+    expect(() => new MessageQueue('redis')).toThrow(/not supported/)
+  })
+})

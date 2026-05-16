@@ -3,10 +3,15 @@ import SNS from 'aws-sdk/clients/sns'
 
 declare module '@rfcx/message-queue' {
   function MessageHandler(message: any): boolean | Promise<boolean>
-  type clientType = 'sns' | 'sqs'
+  type clientType = 'sns' | 'sqs' | 'rabbitmq'
   interface MessageQueueOptions {
     topicPrefix?: string
     topicPostfix?: string
+  }
+  class RabbitMQMessageQueueClient {
+    constructor(options: object)
+    publish(queueName: string, message: unknown): Promise<{ queueName: string, bytes: number }>
+    subscribe(queueName: string, messageHandler: typeof MessageHandler): Promise<void>
   }
   class SQSMessageQueueClient {
     constructor(options: object)
@@ -31,7 +36,7 @@ declare module '@rfcx/message-queue' {
     constructor(clientType: clientType, options?: MessageQueueOptions)
     topicPrefix?: string
     topicPostfix?: string
-    client: SQSMessageQueueClient | SNSMessageQueueClient
+    client: SQSMessageQueueClient | SNSMessageQueueClient | RabbitMQMessageQueueClient
     queueName(): string
     publish(eventName: string, message: unknown): void
     subscribe(eventName: string, messageHandler: typeof MessageHandler): boolean

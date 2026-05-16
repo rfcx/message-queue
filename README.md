@@ -1,4 +1,4 @@
-A simple wrapper on top of message queues.
+A simple wrapper on top of message queues. Supported backends: AWS SQS, AWS SNS, and RabbitMQ.
 
 ## Usage example for SQS
 ```

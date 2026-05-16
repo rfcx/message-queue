@@ -5,7 +5,7 @@
  class MessageQueue {
   /**
    * Create a message queue, injecting a client (e.g. SQS)
-   * @param {string} clientType - client type (currently available only 'sqs')
+   * @param {string} clientType - client type ('sqs', 'sns', or 'rabbitmq')
    * @param {*} options
    * @param {string} options.topicPrefix topic name prefix
    * @param {string} options.topicPostfix topic name postfix
@@ -19,6 +19,8 @@
       client = new (require('./sqs-client'))(baseOpts)
     } else if (clientType === 'sns') {
       client = new (require('./sns-client'))(baseOpts)
+    } else if (clientType === 'rabbitmq') {
+      client = new (require('./rabbitmq-client'))(baseOpts)
     } else {
       throw new Error('MessageQueue clientType is not supported')
     }
