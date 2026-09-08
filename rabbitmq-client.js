@@ -64,10 +64,57 @@ class RabbitMQMessageQueueClient {
     return this._channel
   }
 
+  /**
+   * Verify a queue exists WITHOUT asserting anything about how it is declared.
+   *
+   * 2026-09-08: this used `assertQueue(queueName, { durable: true })`, which
+   * declares a CLASSIC queue (no x-queue-type). Queues in this fleet are
+   * created centrally from platform/rabbitmq/definitions.json, and most are
+   * QUORUM. Re-declaring a quorum queue as classic makes the broker reject the
+   * declare:
+   *
+   *   PRECONDITION_FAILED - inequivalent arg 'x-queue-type' for queue
+   *   'classifierJobFinished': received none but current is the value 'quorum'
+   *
+   * The broker then CLOSES THE CHANNEL, the rejection escapes as an unhandled
+   * rejection, and the consumer process exits. Measured effect before this fix:
+   * `classifierJobFinished` had ZERO consumers (its events went unprocessed)
+   * and core-tasks sat at 1/2 replicas, restarting for days.
+   *
+   * The bug was ORDER-DEPENDENT and so looked intermittent: `segmentCreated`
+   * happens to be classic live, so its declare matched and it subscribed fine;
+   * the very next queue was quorum and killed the process.
+   *
+   * WHY NOT just pass x-queue-type: 'quorum': definitions.json declares 27
+   * CLASSIC queues (every *-dlq) alongside 59 quorum ones, so hardcoding either
+   * type mis-declares the other set. A client cannot know the right answer.
+   *
+   * `checkQueue` is a PASSIVE declare: it verifies existence and asserts
+   * nothing about arguments, so it cannot mismatch by construction. The
+   * platform definition stays the single source of truth.
+   *
+   * NOTE: a failed checkQueue also closes the channel (AMQP semantics), so the
+   * cached channel is dropped before rethrowing; the next call reconnects.
+   */
   async _ensureQueue (queueName) {
     if (this._assertedQueues.has(queueName)) return
     const channel = await this._getChannel()
-    await channel.assertQueue(queueName, { durable: true })
+    try {
+      await channel.checkQueue(queueName)
+    } catch (err) {
+      // The broker closes the channel on a failed passive declare; make sure we
+      // do not hand the dead channel to the next caller.
+      this._channel = null
+      this._assertedQueues.clear()
+      const e = new Error(
+        `Message Queue: queue '${queueName}' is not available on the broker ` +
+        '(it must be created by the platform queue definitions before use). ' +
+        `Underlying error: ${err && err.message ? err.message : err}`
+      )
+      e.queueName = queueName
+      e.cause = err
+      throw e
+    }
     this._assertedQueues.add(queueName)
   }
 
